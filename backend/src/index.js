@@ -3,6 +3,7 @@ import express from 'express';
 import corsMiddleware from './middleware/cors.js';
 import landmarksRouter from './routes/landmarks.js';
 import routesRouter from './routes/routes.js';
+import adminRouter from './routes/admin.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -14,6 +15,7 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', version: '1.0.0' }));
 
 app.use('/landmarks', landmarksRouter);
 app.use('/route', routesRouter);
+app.use('/admin', adminRouter);
 
 app.use((err, _req, res, _next) => {
   console.error(err);
