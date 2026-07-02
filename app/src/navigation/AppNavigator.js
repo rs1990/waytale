@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MapScreen } from '../screens/MapScreen';
 import { RouteScreen } from '../screens/RouteScreen';
+import { ItineraryScreen } from '../screens/ItineraryScreen';
 import { LandmarkDetailScreen } from '../screens/LandmarkDetailScreen';
 import { TourScreen } from '../screens/TourScreen';
 
@@ -28,6 +29,11 @@ export function AppNavigator() {
           name="Route"
           component={RouteScreen}
           options={{ title: 'Plan Route' }}
+        />
+        <Stack.Screen
+          name="Itinerary"
+          component={ItineraryScreen}
+          options={{ title: 'Plan a Trip' }}
         />
         <Stack.Screen
           name="LandmarkDetail"

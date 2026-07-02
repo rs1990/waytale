@@ -56,4 +56,9 @@ export const api = {
   geocode: {
     search: (q) => get(`/geocode/search?q=${encodeURIComponent(q)}`),
   },
+
+  itinerary: {
+    build: (origin, days, mode, interests) =>
+      post('/itinerary/build', { origin, days, mode, interests }),
+  },
 };

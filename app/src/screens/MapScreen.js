@@ -133,6 +133,12 @@ export function MapScreen({ navigation }) {
         >
           <Text style={styles.routeBtnIcon}>🧭</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.itineraryBtn}
+          onPress={() => navigation.navigate('Itinerary', { origin: location })}
+        >
+          <Text style={styles.itineraryBtnIcon}>🗓</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Category chips */}
@@ -234,6 +240,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, elevation: 5,
   },
   routeBtnIcon: { fontSize: 18 },
+  itineraryBtn: {
+    width: 46, height: 46, borderRadius: 23,
+    backgroundColor: '#2563EB', alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, elevation: 5,
+  },
+  itineraryBtnIcon: { fontSize: 18 },
 
   chipBar: { position: 'absolute', top: 108, left: 0, right: 0 },
   chipList: { paddingHorizontal: 12 },
