@@ -6,34 +6,25 @@
 
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator,
 } from 'react-native';
 import MapView, { Polyline, Marker } from 'react-native-maps';
 import { api } from '../services/api';
+import { PlaceAutocomplete } from '../components/PlaceAutocomplete';
 
 export function RouteScreen({ route: navRoute, navigation }) {
   const origin = navRoute.params?.origin;
 
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState(null); // { name, lat, lon }
   const [routes, setRoutes]           = useState([]);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
   const [selected, setSelected]       = useState(0);
 
-  // Stub: parse "lat,lon" from destination input or use geocoded result
-  function parseCoords(str) {
-    const parts = str.split(',').map(Number);
-    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-      return { lat: parts[0], lon: parts[1] };
-    }
-    return null;
-  }
-
   async function handleScore() {
-    const dest = parseCoords(destination);
-    if (!dest) {
-      setError('Enter destination as "lat,lon" (e.g. 37.8199,-122.4783 for Golden Gate)');
+    if (!destination) {
+      setError('Pick a destination from the search results');
       return;
     }
     if (!origin) {
@@ -48,7 +39,7 @@ export function RouteScreen({ route: navRoute, navigation }) {
     try {
       const { routes: scored } = await api.routes.score(
         origin,
-        dest,
+        { lat: destination.lat, lon: destination.lon },
         new Date().toISOString()
       );
       setRoutes(scored);
@@ -104,14 +95,12 @@ export function RouteScreen({ route: navRoute, navigation }) {
       {/* Bottom sheet */}
       <View style={styles.sheet}>
         <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            placeholder='Destination (lat,lon or name)'
-            value={destination}
-            onChangeText={setDestination}
-            returnKeyType="go"
-            onSubmitEditing={handleScore}
-          />
+          <View style={styles.autocompleteWrap}>
+            <PlaceAutocomplete
+              placeholder="Search a destination..."
+              onSelect={setDestination}
+            />
+          </View>
           <TouchableOpacity style={styles.goBtn} onPress={handleScore} disabled={loading}>
             {loading
               ? <ActivityIndicator color="#fff" size="small" />
@@ -166,12 +155,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 10, elevation: 10,
     maxHeight: '45%',
   },
-  inputRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  input: {
-    flex: 1, borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: '#111827',
+  inputRow: { flexDirection: 'row', gap: 10, marginBottom: 10, alignItems: 'flex-start' },
+  autocompleteWrap: { flex: 1 },
+  goBtn: {
+    backgroundColor: '#2563EB', borderRadius: 10, paddingHorizontal: 20,
+    justifyContent: 'center', alignItems: 'center', minHeight: 44,
   },
-  goBtn: { backgroundColor: '#2563EB', borderRadius: 10, paddingHorizontal: 20, justifyContent: 'center' },
   goBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   error: { color: '#DC2626', fontSize: 13, marginBottom: 8 },
 

@@ -52,4 +52,8 @@ export const api = {
     score: (origin, destination, departureTime) =>
       post('/route/score', { origin, destination, departureTime }),
   },
+
+  geocode: {
+    search: (q) => get(`/geocode/search?q=${encodeURIComponent(q)}`),
+  },
 };
