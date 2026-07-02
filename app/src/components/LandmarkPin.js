@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Marker, Callout } from 'react-native-maps';
 
-export function LandmarkPin({ landmark, onPress }) {
+export function LandmarkPin({ landmark, selected, onPress }) {
   return (
     <Marker
       coordinate={{ latitude: landmark.latitude, longitude: landmark.longitude }}
       onPress={() => onPress(landmark)}
+      zIndex={selected ? 10 : 0}
     >
-      <View style={styles.pin}>
+      <View style={[styles.pin, selected && styles.pinActive]}>
         <Text style={styles.icon}>🏛</Text>
       </View>
       <Callout tooltip>
@@ -39,6 +40,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 3,
+  },
+  pinActive: {
+    backgroundColor: '#2563EB',
+    borderColor: '#1D4ED8',
+    padding: 6,
+    transform: [{ scale: 1.15 }],
   },
   icon: { fontSize: 18 },
   callout: {
