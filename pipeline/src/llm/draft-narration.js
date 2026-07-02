@@ -54,10 +54,12 @@ ${sources.map((s, i) => `[${i + 1}] ${s.source}: ${s.source_url}`).join('\n')}
   });
 
   const raw = message.content[0].text.trim();
+  // Strip markdown code fences if model wraps output in ```json ... ```
+  const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
 
   let parsed;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(cleaned);
   } catch {
     throw new Error(`LLM returned non-JSON: ${raw.slice(0, 200)}`);
   }
