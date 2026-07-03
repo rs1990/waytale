@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS landmark_content (
   language     TEXT NOT NULL DEFAULT 'en',
   region       TEXT NOT NULL DEFAULT 'US',
   status       TEXT NOT NULL DEFAULT 'pending'
-                 CHECK (status IN ('pending', 'reviewed', 'published', 'rejected')),
+                 CHECK (status IN ('pending', 'reviewed', 'published', 'rejected', 'archived')),
   version      INTEGER NOT NULL DEFAULT 1,
   created_at   TIMESTAMPTZ DEFAULT NOW(),
   updated_at   TIMESTAMPTZ DEFAULT NOW()
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS landmark_facts (
   source_url  TEXT,
   raw_text    TEXT NOT NULL,
   fact_type   TEXT NOT NULL DEFAULT 'verified'
-                CHECK (fact_type IN ('verified', 'legend')),
+                CHECK (fact_type IN ('verified', 'legend', 'mixed')),
   fetched_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
