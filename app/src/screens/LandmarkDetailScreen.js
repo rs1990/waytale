@@ -161,6 +161,7 @@ function FactTypeBadge({ factType }) {
 
 function Sources({ sources }) {
   if (!sources?.length) return null;
+  const hasWikipedia = sources.some((s) => s.source === 'wikipedia' || s.source === 'wikidata');
   return (
     <View style={styles.sources}>
       <Text style={styles.sourcesLabel}>Sources</Text>
@@ -171,6 +172,17 @@ function Sources({ sources }) {
           </Text>
         </TouchableOpacity>
       ))}
+      {hasWikipedia && (
+        <Text style={styles.attribution}>
+          Adapted from Wikipedia / Wikidata content, used under{' '}
+          <Text
+            style={styles.attributionLink}
+            onPress={() => Linking.openURL('https://creativecommons.org/licenses/by-sa/4.0/')}
+          >
+            CC BY-SA 4.0
+          </Text>.
+        </Text>
+      )}
     </View>
   );
 }
@@ -216,6 +228,8 @@ const styles = StyleSheet.create({
   sources:      { marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
   sourcesLabel: { fontSize: 12, fontWeight: '700', color: '#9CA3AF', marginBottom: 6 },
   sourceLink:   { color: '#2563EB', fontSize: 13, marginBottom: 4 },
+  attribution:  { fontSize: 11, color: '#9CA3AF', marginTop: 6, lineHeight: 16 },
+  attributionLink: { color: '#6B7280', textDecorationLine: 'underline' },
 
   noContent: {
     backgroundColor: '#F3F4F6', borderRadius: 10,

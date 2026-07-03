@@ -28,15 +28,17 @@ if (!existsSync(AUDIO_DIR)) mkdirSync(AUDIO_DIR, { recursive: true });
  * @param {string} opts.contentType  - 'ambient' | 'deep_dive_history' | etc.
  * @param {string} opts.script       - plain text narration script
  * @param {boolean} [opts.premium]   - use Neural engine (more expensive)
- * @returns {Promise<string>} local file path (or CDN URL if using S3)
+ * @returns {Promise<string>} route path served by the backend's /audio static route
+ *   (or a CDN URL once S3 is wired up — same shape, just a different host)
  */
 export async function synthesizeAudio({ landmarkId, contentType, script, premium = false }) {
   const filename = `${landmarkId}_${contentType}.mp3`;
   const filePath = path.join(AUDIO_DIR, filename);
+  const routePath = `/audio/${filename}`;
 
   if (existsSync(filePath)) {
     console.log(`  [polly] cache hit: ${filename}`);
-    return filePath;
+    return routePath;
   }
 
   const command = new SynthesizeSpeechCommand({
@@ -59,7 +61,7 @@ export async function synthesizeAudio({ landmarkId, contentType, script, premium
   await pipeline(response.AudioStream, writer);
 
   console.log(`  [polly] generated: ${filename}`);
-  return filePath;
+  return routePath;
 }
 
 /**

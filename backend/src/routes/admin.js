@@ -206,4 +206,86 @@ router.post('/content/:id/reject', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/**
+ * Sponsors + local recommendations (ad/affiliate placements).
+ * Same pending/reviewed/published gate as landmark_content — see
+ * pipeline/src/db/schema-v3.sql for the reasoning.
+ */
+
+router.get('/sponsors', async (_req, res, next) => {
+  try {
+    const { rows } = await db.query(`SELECT * FROM sponsors ORDER BY name`);
+    res.json({ sponsors: rows });
+  } catch (err) { next(err); }
+});
+
+router.post('/sponsors', async (req, res, next) => {
+  try {
+    const { name, category, website_url, contact_email } = req.body ?? {};
+    if (!name) return res.status(400).json({ error: 'name is required' });
+    const { rows: [sponsor] } = await db.query(
+      `INSERT INTO sponsors (name, category, website_url, contact_email) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [name, category ?? null, website_url ?? null, contact_email ?? null]
+    );
+    res.status(201).json({ sponsor });
+  } catch (err) { next(err); }
+});
+
+router.get('/recommendations', async (_req, res, next) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT lr.*, l.name AS landmark_name, s.name AS sponsor_name
+      FROM local_recommendations lr
+      JOIN landmarks l ON l.id = lr.landmark_id
+      LEFT JOIN sponsors s ON s.id = lr.sponsor_id
+      ORDER BY lr.created_at DESC
+    `);
+    res.json({ recommendations: rows });
+  } catch (err) { next(err); }
+});
+
+router.post('/recommendations', async (req, res, next) => {
+  try {
+    const { landmark_id, sponsor_id, title, description, affiliate_url, image_url, sponsored, priority } = req.body ?? {};
+    if (!landmark_id || !title) return res.status(400).json({ error: 'landmark_id and title are required' });
+    const { rows: [rec] } = await db.query(
+      `INSERT INTO local_recommendations
+         (landmark_id, sponsor_id, title, description, affiliate_url, image_url, sponsored, priority)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [landmark_id, sponsor_id ?? null, title, description ?? null, affiliate_url ?? null, image_url ?? null, !!sponsored, priority ?? 0]
+    );
+    res.status(201).json({ recommendation: rec });
+  } catch (err) { next(err); }
+});
+
+router.post('/recommendations/:id/approve', async (req, res, next) => {
+  try {
+    await db.query(
+      `UPDATE local_recommendations SET status='reviewed', updated_at=NOW() WHERE id=$1 AND status='pending'`,
+      [req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
+router.post('/recommendations/:id/publish', async (req, res, next) => {
+  try {
+    await db.query(
+      `UPDATE local_recommendations SET status='published', updated_at=NOW() WHERE id=$1`,
+      [req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
+router.post('/recommendations/:id/reject', async (req, res, next) => {
+  try {
+    await db.query(
+      `UPDATE local_recommendations SET status='rejected', updated_at=NOW() WHERE id=$1`,
+      [req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
 export default router;

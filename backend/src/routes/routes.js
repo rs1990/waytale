@@ -119,7 +119,7 @@ function generateStubRoutes(origin, destination) {
  * Returns 0–20. Higher = more crowded = more penalty.
  * No live data needed — this is the universal fallback per spec.
  */
-function computeCrowdPenalty(departure, landmarkCount) {
+export function computeCrowdPenalty(departure, landmarkCount) {
   const hour = departure.getHours();
   const dow  = departure.getDay(); // 0=Sun, 6=Sat
   const isWeekend = dow === 0 || dow === 6;

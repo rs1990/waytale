@@ -27,6 +27,15 @@ async function post(path, body) {
   return res.json();
 }
 
+// audio_url is stored server-side as a relative route path (e.g. /audio/xxx.mp3)
+// so it stays portable across localhost/LAN/prod without a DB migration.
+function withAudioUrl(item) {
+  if (item?.audio_url?.startsWith('/')) {
+    return { ...item, audio_url: `${BASE_URL}${item.audio_url}` };
+  }
+  return item;
+}
+
 export const api = {
   health: () => get('/health'),
 
@@ -40,7 +49,8 @@ export const api = {
       if (type)    params.set('type', type);
       if (variant) params.set('variant', variant);
       if (length)  params.set('length', length);
-      return get(`/landmarks/${id}/content?${params}`);
+      return get(`/landmarks/${id}/content?${params}`)
+        .then(({ content }) => ({ content: content.map(withAudioUrl) }));
     },
     alongRoute: (points, radius = 2) => {
       const encoded = points.map(([lat, lon]) => `${lat},${lon}`).join('|');

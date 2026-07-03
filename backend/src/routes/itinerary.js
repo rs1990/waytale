@@ -7,10 +7,11 @@
 
 import { Router } from 'express';
 import { db } from '../db/client.js';
+import { PUBLIC_STATUSES } from '../db/contentStatus.js';
 
 const router = Router();
 
-const MODE_PROFILES = {
+export const MODE_PROFILES = {
   walking: { speedKmh: 4.5, dwellMinutes: 20, stopsPerDay: 5 },
   cycling: { speedKmh: 15,  dwellMinutes: 15, stopsPerDay: 6 },
   driving: { speedKmh: 35,  dwellMinutes: 20, stopsPerDay: 7 },
@@ -64,12 +65,12 @@ router.post('/build', async (req, res, next) => {
 });
 
 async function fetchCandidates(origin, radiusKm, interests) {
-  const params = [origin.lat, origin.lon, radiusKm * 1000];
+  const params = [origin.lat, origin.lon, radiusKm * 1000, PUBLIC_STATUSES];
   let interestClause = '';
 
   if (interests?.length) {
     params.push(interests.map((i) => `%${i}%`));
-    interestClause = `AND (l.name ILIKE ANY($4::text[]) OR l.description ILIKE ANY($4::text[]))`;
+    interestClause = `AND (l.name ILIKE ANY($5::text[]) OR l.description ILIKE ANY($5::text[]))`;
   }
 
   const { rows } = await db.query(`
@@ -80,7 +81,7 @@ async function fetchCandidates(origin, radiusKm, interests) {
         ST_Distance(l.location, ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography) AS distance_m,
         (
           SELECT COUNT(*) FROM landmark_content lc
-          WHERE lc.landmark_id = l.id AND lc.status IN ('reviewed', 'published')
+          WHERE lc.landmark_id = l.id AND lc.status = ANY($4::text[])
         ) AS content_count
       FROM landmarks l
       WHERE ST_DWithin(
@@ -97,7 +98,7 @@ async function fetchCandidates(origin, radiusKm, interests) {
   return rows;
 }
 
-function haversineKm(lat1, lon1, lat2, lon2) {
+export function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -106,7 +107,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-function buildDays(origin, candidates, days, profile, dayRadiusKm) {
+export function buildDays(origin, candidates, days, profile, dayRadiusKm) {
   const used = new Set();
   const result = [];
 

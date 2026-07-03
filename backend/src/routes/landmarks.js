@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db/client.js';
+import { PUBLIC_STATUSES } from '../db/contentStatus.js';
 
 const router = Router();
 
@@ -26,7 +27,7 @@ router.get('/nearby', async (req, res, next) => {
         ST_Distance(l.location, ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography) AS distance_m,
         (
           SELECT COUNT(*) FROM landmark_content lc
-          WHERE lc.landmark_id = l.id AND lc.status IN ('reviewed', 'published')
+          WHERE lc.landmark_id = l.id AND lc.status = ANY($5::text[])
         ) AS content_count
       FROM landmarks l
       WHERE ST_DWithin(
@@ -36,7 +37,55 @@ router.get('/nearby', async (req, res, next) => {
       )
       ORDER BY distance_m
       LIMIT $4
-    `, [lat, lon, radius, limit]);
+    `, [lat, lon, radius, limit, PUBLIC_STATUSES]);
+
+    res.json({ landmarks: rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * GET /landmarks/along-route?points=lat,lon|lat,lon|...&radius=2
+ * Returns landmarks within radius km of a polyline (route points).
+ * Points encoded as "lat,lon" pairs separated by |.
+ *
+ * NOTE: must be registered before GET /:id — Express would otherwise match
+ * "along-route" as an :id value (it's a single path segment) and this route
+ * would never be reached.
+ */
+router.get('/along-route', async (req, res, next) => {
+  try {
+    const { points, radius = 2 } = req.query;
+    if (!points) return res.status(400).json({ error: 'points required' });
+
+    const coords = points.split('|').map(p => {
+      const [lat, lon] = p.split(',').map(Number);
+      return [lat, lon];
+    });
+
+    if (coords.length < 2) return res.status(400).json({ error: 'at least 2 points required' });
+
+    // Build a WKT LineString for the route
+    const wkt = `LINESTRING(${coords.map(([lat, lon]) => `${lon} ${lat}`).join(',')})`;
+
+    const { rows } = await db.query(`
+      SELECT
+        l.id, l.wikidata_id, l.name, l.description,
+        l.latitude, l.longitude, l.image_url, l.category,
+        ST_Distance(
+          l.location,
+          ST_SetSRID(ST_GeomFromText($1), 4326)::geography
+        ) AS distance_to_route_m
+      FROM landmarks l
+      WHERE ST_DWithin(
+        l.location,
+        ST_SetSRID(ST_GeomFromText($1), 4326)::geography,
+        $2 * 1000
+      )
+      ORDER BY distance_to_route_m
+      LIMIT 30
+    `, [wkt, radius]);
 
     res.json({ landmarks: rows });
   } catch (err) {
@@ -74,10 +123,10 @@ router.get('/:id/content', async (req, res, next) => {
       SELECT lc.* FROM landmark_content lc
       JOIN landmarks l ON l.id = lc.landmark_id
       WHERE (l.id::text = $1 OR l.wikidata_id = $1)
-        AND lc.status IN ('reviewed', 'published')
+        AND lc.status = ANY($2::text[])
     `;
-    const params = [req.params.id];
-    let idx = 2;
+    const params = [req.params.id, PUBLIC_STATUSES];
+    let idx = 3;
 
     if (type)    { sql += ` AND lc.content_type = $${idx++}`;  params.push(type);    }
     if (variant) { sql += ` AND lc.variant = $${idx++}`;       params.push(variant); }
@@ -93,44 +142,24 @@ router.get('/:id/content', async (req, res, next) => {
 });
 
 /**
- * GET /landmarks/along-route?points=lat,lon|lat,lon|...&radius=2
- * Returns landmarks within radius km of a polyline (route points).
- * Points encoded as "lat,lon" pairs separated by |.
+ * GET /landmarks/:id/recommendations
+ * Published local recommendations (affiliate links, sponsored or organic)
+ * for a landmark, ordered by priority. "sponsored" must be surfaced as such
+ * in the UI when true — see pipeline/src/db/schema-v3.sql.
  */
-router.get('/along-route', async (req, res, next) => {
+router.get('/:id/recommendations', async (req, res, next) => {
   try {
-    const { points, radius = 2 } = req.query;
-    if (!points) return res.status(400).json({ error: 'points required' });
-
-    const coords = points.split('|').map(p => {
-      const [lat, lon] = p.split(',').map(Number);
-      return [lat, lon];
-    });
-
-    if (coords.length < 2) return res.status(400).json({ error: 'at least 2 points required' });
-
-    // Build a WKT LineString for the route
-    const wkt = `LINESTRING(${coords.map(([lat, lon]) => `${lon} ${lat}`).join(',')})`;
-
     const { rows } = await db.query(`
-      SELECT
-        l.id, l.wikidata_id, l.name, l.description,
-        l.latitude, l.longitude, l.image_url, l.category,
-        ST_Distance(
-          l.location,
-          ST_SetSRID(ST_GeomFromText($1), 4326)::geography
-        ) AS distance_to_route_m
-      FROM landmarks l
-      WHERE ST_DWithin(
-        l.location,
-        ST_SetSRID(ST_GeomFromText($1), 4326)::geography,
-        $2 * 1000
-      )
-      ORDER BY distance_to_route_m
-      LIMIT 30
-    `, [wkt, radius]);
-
-    res.json({ landmarks: rows });
+      SELECT lr.id, lr.title, lr.description, lr.affiliate_url, lr.image_url,
+             lr.sponsored, s.name AS sponsor_name
+      FROM local_recommendations lr
+      JOIN landmarks l ON l.id = lr.landmark_id
+      LEFT JOIN sponsors s ON s.id = lr.sponsor_id
+      WHERE (l.id::text = $1 OR l.wikidata_id = $1)
+        AND lr.status = 'published'
+      ORDER BY lr.priority DESC, lr.created_at DESC
+    `, [req.params.id]);
+    res.json({ recommendations: rows });
   } catch (err) {
     next(err);
   }
