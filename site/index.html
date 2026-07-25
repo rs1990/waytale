@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WayTale: GPS-triggered landmark audio tours</title>
+<meta name="description" content="A GPS-triggered audio tour app narrating landmark history, geography, and culture, built on a pre-generated and human-reviewed content pipeline.">
+<meta property="og:title" content="WayTale: GPS-triggered landmark audio tours">
+<meta property="og:description" content="A GPS-triggered audio tour app narrating landmark history, geography, and culture, built on a pre-generated and human-reviewed content pipeline.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230369a1'/><text x='50' y='68' font-size='56' font-family='Helvetica,Arial' font-weight='700' fill='white' text-anchor='middle'>W</text></svg>">
+<style>
+  :root {
+    --accent: #0369a1;
+    --accent-soft: #e2eff7;
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --border: #e6e2d9;
+    --ink: #1b1a17;
+    --ink-soft: #56534c;
+    --ink-faint: #86827a;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 28px; }
+
+  header.site {
+    border-bottom: 1px solid var(--border);
+    background: rgba(250, 249, 246, 0.92);
+    backdrop-filter: saturate(160%) blur(8px);
+    position: sticky; top: 0; z-index: 20;
+  }
+  header.site .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; height: 64px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 650; letter-spacing: -0.01em; }
+  .brand .dot { width: 11px; height: 11px; border-radius: 3px; background: var(--accent); }
+  nav.top { display: flex; gap: 22px; font-size: 15px; }
+  nav.top a { color: var(--ink-soft); }
+  nav.top a:hover { color: var(--accent); text-decoration: none; }
+  @media (max-width: 700px) { nav.top a.hide-sm { display: none; } }
+
+  section { padding: 62px 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: 0; }
+
+  .hero { padding: 82px 0 66px; border-bottom: 1px solid var(--border); }
+  .eyebrow {
+    display: inline-block; font-size: 12.5px; font-weight: 650;
+    letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 5px 11px; border-radius: 999px; margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(38px, 6.2vw, 60px); line-height: 1.06;
+    letter-spacing: -0.032em; font-weight: 700; margin: 0 0 20px;
+  }
+  .lede { font-size: clamp(18px, 2.4vw, 21px); color: var(--ink-soft); max-width: 44em; margin: 0 0 30px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-block; padding: 11px 20px; border-radius: 8px;
+    font-size: 15px; font-weight: 600; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff;
+  }
+  .btn:hover { text-decoration: none; opacity: 0.9; }
+  .btn.ghost { background: transparent; color: var(--accent); }
+
+  h2 { font-size: 27px; letter-spacing: -0.022em; font-weight: 680; margin: 0 0 10px; }
+  .sub { color: var(--ink-faint); font-size: 15.5px; margin: 0 0 30px; }
+  h3 { font-size: 17px; font-weight: 650; margin: 0 0 7px; letter-spacing: -0.008em; }
+  p { margin: 0 0 18px; }
+  p.body { max-width: 46em; color: var(--ink-soft); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 42px; }
+  .stat { background: var(--surface); padding: 22px 20px; }
+  .stat .v { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; color: var(--accent); line-height: 1.15; }
+  .stat .k { font-size: 13.5px; color: var(--ink-faint); margin-top: 5px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .card p { margin: 0; font-size: 15.5px; color: var(--ink-soft); line-height: 1.6; }
+  .card .n { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; display: block; margin-bottom: 9px; }
+
+  pre.diagram {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px; overflow-x: auto; font-size: 13px; line-height: 1.62;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--ink-soft); margin: 0;
+  }
+
+  ul.facts { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 34px; }
+  ul.facts li { break-inside: avoid; padding: 9px 0 9px 20px; position: relative; font-size: 15.5px; color: var(--ink-soft); border-bottom: 1px solid var(--border); }
+  ul.facts li::before { content: ""; position: absolute; left: 0; top: 18px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
+  @media (max-width: 700px) { ul.facts { columns: 1; } }
+
+  .stack { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 13.5px; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--ink-soft); }
+
+  .note { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 22px 24px; }
+  .note p { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
+  .note p + p { margin-top: 12px; }
+
+  footer.site { padding: 40px 0 56px; color: var(--ink-faint); font-size: 14.5px; }
+  footer.site .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>WayTale</div>
+    <nav class="top">
+      <a href="#overview">Overview</a>
+      <a href="#architecture" class="hide-sm">Architecture</a>
+      <a href="#features" class="hide-sm">Features</a>
+      <a href="#status">Status</a>
+      <a href="https://github.com/rs1990/waytale" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Mobile and content pipeline</span>
+    <h1>The narration is written before you arrive.</h1>
+    <p class="lede">WayTale narrates the history, geography, and culture of landmarks as you travel. The design bet is that live generation is the wrong answer: facts are pulled from Wikidata and Wikipedia, drafted into scripts by Claude, synthesized to audio once, reviewed by a human, and cached. Every user hears the same approved recording.</p>
+    <div class="cta">
+      <a class="btn" href="https://github.com/rs1990/waytale" rel="noopener">View source</a>
+      <a class="btn ghost" href="#overview">How it works</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v">63</div><div class="k">US National Parks seeded</div></div>
+      <div class="stat"><div class="v">250m</div><div class="k">geofence trigger radius</div></div>
+      <div class="stat"><div class="v">published</div><div class="k">the only status the app can read</div></div>
+      <div class="stat"><div class="v">3 tiers</div><div class="k">pipeline, backend, app</div></div>
+    </div>
+  </div>
+</div>
+
+<section id="overview">
+  <div class="wrap">
+    <h2>What it does</h2>
+    <p class="sub">Pre-generation is the architecture, not an optimization.</p>
+    <p class="body">Generating narration at request time would mean paying for every listen, waiting for every listen, and shipping unreviewed claims about real places to real people. WayTale inverts that. An offline pipeline pulls landmark metadata from Wikidata SPARQL and sourced text from the Wikipedia REST API, drafts four script variants with Claude constrained to those facts, synthesizes audio through Amazon Polly, and lands rows in Postgres with status pending.</p>
+    <p class="body">An admin dashboard is where content becomes real. A reviewer reads the script alongside its sources and approves, publishes, or rejects. The mobile app queries only rows with status published, so nothing reaches a user that a human has not signed off on. Every fact carries a provenance tag of verified, legend, or mixed, enforced at the schema level and surfaced as a badge in the interface, so folklore is never presented as history.</p>
+    <p class="body">The backend is an Express service over PostGIS. Landmark locations live in a GEOGRAPHY(POINT, 4326) column with a GIST index, which makes nearest-landmark lookups a spatial query rather than a bounding box scan. The Expo app polls GPS, fetches nearby landmarks, and fires narration when the user crosses a 250 metre geofence.</p>
+    <p class="body">Content does not go stale silently. A refresh log tracks the Wikipedia revision each script was drafted from, so a redraft only fires when the source article actually changed, and the previously published version stays live until the new one clears review.</p>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <h2>Architecture</h2>
+    <p class="sub">An offline pipeline, an always-on API, and a thin client.</p>
+    <pre class="diagram"> Phase 0: content pipeline   (admin only, runs offline)
+ -------------------------------------------------------------
+  Wikidata SPARQL      Wikipedia REST API       Reviews API
+        |                     |                      |
+  [landmark metadata]  [sourced facts]        [concrete tips]
+        +---------------------+----------------------+
+                              |
+                    Claude narration draft
+                    - injects facts and tips only
+                    - tags verified | legend | mixed
+                    - outputs 4 script variants
+                              |
+                    Amazon Polly TTS synthesis
+                              |
+                PostgreSQL content cache (status: pending)
+                              |
+                    Admin dashboard review
+                    [ approve / publish / reject ]
+
+ Runtime
+ -------------------------------------------------------------
+  Expo app  --GPS--&gt;  Express + PostGIS  --published only--&gt;
+  nearest landmark (GIST index)  -&gt;  narration + cached audio</pre>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Engineering details</h2>
+    <p class="sub">The decisions that carry the design.</p>
+    <div class="cards">
+      <div class="card"><span class="n">01</span><h3>Publish-gated cache</h3><p>The application reads only rows with status published. Pipeline output is fully insulated from users until a reviewer approves it, which means a bad draft is an internal problem rather than an incident.</p></div>
+      <div class="card"><span class="n">02</span><h3>PostGIS spatial queries</h3><p>Landmark locations use a GEOGRAPHY(POINT, 4326) column with a GIST index, so nearest-landmark lookups are true spatial queries rather than bounding box approximations.</p></div>
+      <div class="card"><span class="n">03</span><h3>Revision-diffed refresh</h3><p>A content refresh log records the Wikipedia revision behind each script. Redrafts fire only when the source article changed, and the live published version is never pulled down while its replacement is in review.</p></div>
+      <div class="card"><span class="n">04</span><h3>Schema-level fact provenance</h3><p>Every piece of content is tagged verified, legend, or mixed. The constraint lives in the database, not in application code, and the tag is rendered as a visible badge.</p></div>
+      <div class="card"><span class="n">05</span><h3>Source citations throughout</h3><p>Each narrated fact links back to its Wikipedia or Wikidata origin, so a listener can check any claim rather than trust the app.</p></div>
+      <div class="card"><span class="n">06</span><h3>Route scoring</h3><p>The backend returns two or three route options scored on travel time, landmark count, and a crowd heuristic, built over a raw latitude and longitude route endpoint.</p></div>
+      <div class="card"><span class="n">07</span><h3>Multi-day itinerary builder</h3><p>Place-name search and itinerary assembly sit on top of the same scoring endpoint, letting a trip be planned across days rather than a single drive.</p></div>
+      <div class="card"><span class="n">08</span><h3>Reproducible local stack</h3><p>Docker Compose brings up Postgres with PostGIS, the backend, and the admin dashboard together. The PostGIS image is pinned to linux/amd64 through Rosetta after the arm64 manifest proved unavailable for the pinned tag.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <h2>Numbers from the code</h2>
+    <p class="sub">Measured or configured values, not projections.</p>
+    <ul class="facts">
+      <li>About 4,850 lines total across app, backend, pipeline, and admin</li>
+      <li>App about 1,994 lines, backend 1,085, pipeline 1,257, admin 514</li>
+      <li>63 US National Parks seeded through a dedicated seed script</li>
+      <li>5 database tables with a GIST spatial index on landmark location</li>
+      <li>Geofence trigger radius: 250 metres</li>
+      <li>Narration length: 3 to 5 minutes per landmark deep dive</li>
+      <li>4 script variants generated per landmark</li>
+      <li>Polly voices: Neural for premium, Standard for long tail</li>
+      <li>PostgreSQL 16 with PostGIS 3.4</li>
+      <li>4 documentation files beyond the README: architecture, API, database, deployment</li>
+      <li>14 commits, all inside a roughly 30 hour window</li>
+      <li>Admin dashboard on port 4000, backend API separate</li>
+    </ul>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <h2>Stack</h2>
+    <p class="sub">React Native at the edge, Node and PostGIS at the centre.</p>
+    <div class="stack">
+      <span class="chip">React Native (Expo)</span>
+      <span class="chip">Express.js</span>
+      <span class="chip">Node.js</span>
+      <span class="chip">PostgreSQL 16</span>
+      <span class="chip">PostGIS 3.4</span>
+      <span class="chip">Redis (optional)</span>
+      <span class="chip">Claude (narration drafting)</span>
+      <span class="chip">Amazon Polly TTS</span>
+      <span class="chip">React + Vite admin</span>
+      <span class="chip">Docker Compose</span>
+      <span class="chip">Wikidata SPARQL</span>
+      <span class="chip">Wikipedia REST API</span>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <div class="wrap">
+    <h2>Status</h2>
+    <p class="sub">An honest account of what is built and what is not.</p>
+    <div class="note">
+      <p>Backend, content pipeline, and admin dashboard are functional locally through Docker Compose and a launch script, with content seeded for all 63 US National Parks.</p>
+      <p>Built in a concentrated sprint of 14 commits across roughly 30 hours, which included fixing two check-constraint bugs and a SPARQL latitude and longitude extraction bug along the way.</p>
+      <p>Not built, and listed as roadmap rather than implied: offline itinerary downloads, interest-based personalization, live geofence auto-pause, subscription tiers, and multi-language support. There is no automated test suite in the repository.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="row">
+      <div>WayTale. Built by Raghavendra. Open source.</div>
+      <div><a href="https://github.com/rs1990/waytale" rel="noopener">github.com/rs1990/waytale</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
