@@ -180,19 +180,16 @@
   .cwrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 34px; align-items: start; }
   @media (max-width: 900px) { .cwrap { grid-template-columns: 1fr; } }
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; box-shadow: var(--shadow); }
-  .field { margin-bottom: 18px; }
-  .field label { display: block; font-size: 14px; font-weight: 620; margin-bottom: 7px; }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--bg); color: var(--ink); font-size: 15.5px; font-family: inherit;
+  .soonmark {
+    width: 54px; height: 54px; border-radius: 15px; display: grid; place-items: center;
+    background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+    color: #fff; font-size: 27px; font-weight: 700; margin-bottom: 22px;
   }
-  .field textarea { min-height: 132px; resize: vertical; }
-  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent-wash); border-color: var(--accent); }
-  .formnote { font-size: 13.5px; color: var(--ink-faint); margin: 14px 0 0; }
+  .soonlist { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .soonlist h3 { margin: 0 0 10px; font-size: 16px; }
   .direct { border: 1px solid var(--border); border-radius: 16px; padding: 26px; background: var(--surface); margin-bottom: 20px; }
   .direct h3 { margin: 0 0 6px; font-size: 17px; }
   .direct p { margin: 0 0 14px; font-size: 15px; color: var(--ink-soft); }
-  .direct a.mail { font-size: 17px; font-weight: 650; color: var(--accent); word-break: break-all; }
   .asklist { list-style: none; padding: 0; margin: 0; }
   .asklist li { font-size: 15px; color: var(--ink-soft); padding: 10px 0 10px 24px; position: relative; border-top: 1px solid var(--border-soft); }
   .asklist li:first-child { border-top: 0; }
@@ -225,45 +222,12 @@
   <div class="wrap">
     <div class="cwrap">
       <div class="panel">
-        <h2 style="font-size:23px;margin-bottom:8px">Send a message</h2>
-        <p style="font-size:15.5px;color:var(--ink-soft);margin-bottom:26px">Let us know which region matters to you and we will tell you where it sits.</p>
-        <form id="contactForm">
-          <div class="field">
-            <label for="cf-name">Your name</label>
-            <input id="cf-name" name="name" type="text" autocomplete="name" required>
-          </div>
-          <div class="field">
-            <label for="cf-org">Company or organisation</label>
-            <input id="cf-org" name="org" type="text" autocomplete="organization">
-          </div>
-          <div class="field">
-            <label for="cf-topic">What is this about</label>
-            <select id="cf-topic" name="topic">
-              <option>Request early access</option>
-              <option>Suggest a region or landmark</option>
-              <option>Tourism or heritage partnership</option>
-              <option>Press and media</option>
-              <option>Something else</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="cf-msg">Message</label>
-            <textarea id="cf-msg" name="message" required placeholder="I drive the Pacific Coast Highway a few times a year and would love coverage between Monterey and San Luis Obispo."></textarea>
-          </div>
-          <button class="btn" type="submit">Open in my email app</button>
-          <p class="formnote">This form does not submit anywhere. It composes the message in your own email client so you can review and send it yourself. Nothing is stored, logged, or transmitted by this page.</p>
-        </form>
-      </div>
-
-      <div>
-        <div class="direct">
-          <h3>Email directly</h3>
-          <p>Email works just as well as the form, and reaches the same place.</p>
-          <a class="mail" href="mailto:raghu.s1211@gmail.com?subject=WayTale%20enquiry">raghu.s1211@gmail.com</a>
-        </div>
-        <div class="direct">
-          <h3>Good things to include</h3>
-          <p>The more of this you can share, the more useful the first reply will be.</p>
+        <span class="soonmark">W</span>
+        <h2 style="font-size:25px;margin-bottom:12px">Enquiries open shortly</h2>
+        <p style="font-size:16.5px;color:var(--ink-soft);margin-bottom:20px">An early access sign-up for WayTale is being set up and will be published on this page shortly.</p>
+        <p style="font-size:16.5px;color:var(--ink-soft);margin-bottom:0">Coverage is expanding region by region, and requests shape the order. When the list opens, telling us where you drive is the single most useful thing you can send.</p>
+        <div class="soonlist">
+          <h3>What to have ready</h3>
           <ul class="asklist">
             <li>Which region or route you would most like covered</li>
             <li>Whether you travel mainly by car, by bike, or on foot</li>
@@ -271,41 +235,41 @@
             <li>For partnerships, the landmarks or sites you represent</li>
           </ul>
         </div>
+      </div>
+
+      <div>
+        <div class="direct">
+          <h3>What you can expect</h3>
+          <p>A direct conversation rather than a sales sequence. The first reply will tell you whether WayTale fits what you are doing, including when the honest answer is that it does not.</p>
+        </div>
+        <div class="direct">
+          <h3>Typical enquiries</h3>
+          <p>The topics that come up most often.</p>
+          <ul class="asklist">
+            <li>Request early access</li>
+            <li>Suggest a region or landmark</li>
+            <li>Tourism or heritage partnership</li>
+            <li>Press and media</li>
+            <li>Something else</li>
+          </ul>
+        </div>
         <div class="direct" style="margin-bottom:0">
-          <h3>Prefer to look first</h3>
-          <p>The content pipeline and the review workflow are open source, so you can see exactly how a story gets made and checked.</p>
-          <a class="btn ghost sm" href="https://github.com/rs1990/waytale" rel="noopener">Browse the source code</a>
+          <h3>In the meantime</h3>
+          <p>The FAQ covers coverage, how stories are checked, and what is not built yet.</p>
+          <a class="btn ghost sm" href="index.html#faq">Read the FAQ</a>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-<script>
-  document.getElementById('contactForm').addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    var f = ev.target;
-    var subject = 'WayTale enquiry: ' + f.topic.value;
-    var body = [
-      'Name: ' + f.name.value,
-      'Company: ' + (f.org.value || 'not given'),
-      'Topic: ' + f.topic.value,
-      '',
-      f.message.value
-    ].join('\n');
-    window.location.href = 'mailto:raghu.s1211@gmail.com'
-      + '?subject=' + encodeURIComponent(subject)
-      + '&body=' + encodeURIComponent(body);
-  });
-</script>
 <footer class="site">
   <div class="wrap">
     <div class="row">
       <div>WayTale. Sourced, reviewed audio guides for the road.</div>
       <div class="flinks">
-        <a href="contact.html">Contact</a>
+        <a href="index.html#how">How it works</a>
         <a href="index.html#faq">FAQ</a>
-        <a href="https://github.com/rs1990/waytale" rel="noopener">Source code</a>
+        <a href="contact.html">Contact</a>
       </div>
     </div>
   </div>
