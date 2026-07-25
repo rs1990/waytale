@@ -8,7 +8,7 @@
 <meta property="og:title" content="Contact WayTale">
 <meta property="og:description" content="Request early access to WayTale, or partner with us on coverage for your region.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230369a1'/><text x='50' y='69' font-size='58' font-family='Helvetica,Arial' font-weight='700' fill='white' text-anchor='middle'>W</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2048%2048%27%3E%3Crect%20width%3D%2748%27%20height%3D%2748%27%20rx%3D%2711%27%20fill%3D%27%230369a1%27%2F%3E%3Cg%20transform%3D%27translate%2824%2024%29%20scale%28.72%29%20translate%28-24%20-24%29%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%273.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M18%2043.5s11.5-12.4%2011.5-21.5a11.5%2011.5%200%201%200-23%200C6.5%2031.1%2018%2043.5%2018%2043.5z%27%2F%3E%3Ccircle%20cx%3D%2718%27%20cy%3D%2721.5%27%20r%3D%274%27%20fill%3D%27%23fff%27%20stroke%3D%27none%27%2F%3E%3Cpath%20d%3D%27M35%2015.5a12%2012%200%200%201%200%2017%27%20opacity%3D%27.7%27%2F%3E%3Cpath%20d%3D%27M41.5%209.5a20.5%2020.5%200%200%201%200%2029%27%20opacity%3D%27.45%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <style>
   :root {
     --accent: #0369a1;
@@ -49,6 +49,24 @@
     color: #fff; font-size: 24px; font-weight: 700; display: grid; place-items: center;
     box-shadow: 0 4px 14px -4px var(--accent-wash);
   }
+  .logo .mark svg { width: 62%; height: 62%; }
+  .brandblock { display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 0 0 34px; }
+  .brandblock .glyph {
+    width: 128px; height: 128px; border-radius: 34px; display: grid; place-items: center; flex: none;
+    background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+    box-shadow: 0 26px 54px -24px var(--accent), 0 2px 0 rgba(255,255,255,.22) inset;
+  }
+  .brandblock .glyph svg { width: 64%; height: 64%; }
+  .brandblock .name {
+    font-size: clamp(44px, 7.4vw, 78px); font-weight: 700; letter-spacing: -.042em;
+    line-height: 1; margin: 0; color: var(--ink);
+  }
+  @media (max-width: 620px) { .brandblock .glyph { width: 104px; height: 104px; border-radius: 28px; } }
+  .hero .wrap { text-align: center; }
+  .hero h1 { font-size: clamp(27px, 3.3vw, 40px); letter-spacing: -.026em; max-width: 20em; margin-left: auto; margin-right: auto; color: var(--ink-soft); font-weight: 620; }
+  .hero p.sell { margin-left: auto; margin-right: auto; }
+  .hero .actions { justify-content: center; }
+  .hero .metric { text-align: center; }
   .navlinks { display: flex; gap: 27px; margin-left: auto; font-size: 15px; color: var(--ink-soft); }
   .navlinks a:hover { color: var(--accent); }
   .btn {
@@ -161,6 +179,8 @@
   details.faq p { margin: 0 0 22px; color: var(--ink-soft); font-size: 16px; max-width: 46em; padding-right: 30px; }
 
   .cta { border-radius: 24px; padding: 66px 44px; text-align: center; background: linear-gradient(150deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff; }
+  .cta .bigmark svg { width: 60%; height: 60%; }
+  .soonmark svg { width: 58%; height: 58%; }
   .cta .bigmark { width: 68px; height: 68px; border-radius: 19px; margin: 0 auto 24px; display: grid; place-items: center; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); font-size: 33px; font-weight: 700; }
   .cta h2 { color: #fff; margin: 0 auto 14px; max-width: 16em; }
   .cta p { color: rgba(255,255,255,.87); font-size: 18px; max-width: 36em; margin: 0 auto 30px; }
@@ -199,7 +219,7 @@
 <body>
 <nav class="bar">
   <div class="wrap">
-    <a class="logo" href="index.html"><span class="mark">W</span>WayTale</a>
+    <a class="logo" href="index.html"><span class="mark"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M18 43.5s11.5-12.4 11.5-21.5a11.5 11.5 0 1 0-23 0C6.5 31.1 18 43.5 18 43.5z"/><circle cx="18" cy="21.5" r="4" fill="#fff" stroke="none"/><path d="M35 15.5a12 12 0 0 1 0 17" opacity=".7"/><path d="M41.5 9.5a20.5 20.5 0 0 1 0 29" opacity=".45"/></svg></span>WayTale</a>
     <div class="navlinks">
       <a href="index.html#problem">Why</a>
       <a href="index.html#how">How it works</a>
@@ -212,6 +232,7 @@
 </nav>
 <div class="hero" style="padding:74px 0 44px">
   <div class="wrap">
+    <div class="brandblock"><span class="glyph"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M18 43.5s11.5-12.4 11.5-21.5a11.5 11.5 0 1 0-23 0C6.5 31.1 18 43.5 18 43.5z"/><circle cx="18" cy="21.5" r="4" fill="#fff" stroke="none"/><path d="M35 15.5a12 12 0 0 1 0 17" opacity=".7"/><path d="M41.5 9.5a20.5 20.5 0 0 1 0 29" opacity=".45"/></svg></span><p class="name">WayTale</p></div>
     <span class="pill"><span class="tick"></span>Early access, expanding region by region</span>
     <h1 style="font-size:clamp(36px,4.6vw,54px)">Tell us where you are driving.</h1>
     <p class="sell">WayTale covers all 63 US National Parks today and is adding regions in order of demand. Ask for early access, tell us which roads you want covered, or get in touch about a tourism or heritage partnership.</p>
@@ -222,7 +243,7 @@
   <div class="wrap">
     <div class="cwrap">
       <div class="panel">
-        <span class="soonmark">W</span>
+        <span class="soonmark"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M18 43.5s11.5-12.4 11.5-21.5a11.5 11.5 0 1 0-23 0C6.5 31.1 18 43.5 18 43.5z"/><circle cx="18" cy="21.5" r="4" fill="#fff" stroke="none"/><path d="M35 15.5a12 12 0 0 1 0 17" opacity=".7"/><path d="M41.5 9.5a20.5 20.5 0 0 1 0 29" opacity=".45"/></svg></span>
         <h2 style="font-size:25px;margin-bottom:12px">Enquiries open shortly</h2>
         <p style="font-size:16.5px;color:var(--ink-soft);margin-bottom:20px">An early access sign-up for WayTale is being set up and will be published on this page shortly.</p>
         <p style="font-size:16.5px;color:var(--ink-soft);margin-bottom:0">Coverage is expanding region by region, and requests shape the order. When the list opens, telling us where you drive is the single most useful thing you can send.</p>
