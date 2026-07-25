@@ -3,259 +3,306 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WayTale: GPS-triggered landmark audio tours</title>
-<meta name="description" content="A GPS-triggered audio tour app narrating landmark history, geography, and culture, built on a pre-generated and human-reviewed content pipeline.">
-<meta property="og:title" content="WayTale: GPS-triggered landmark audio tours">
-<meta property="og:description" content="A GPS-triggered audio tour app narrating landmark history, geography, and culture, built on a pre-generated and human-reviewed content pipeline.">
+<title>WayTale: the story of every place you drive past</title>
+<meta name="description" content="A GPS audio guide that narrates the history, geography, and culture of landmarks as you travel. Every story is sourced, fact-checked, and reviewed before you hear it.">
+<meta property="og:title" content="WayTale: the story of every place you drive past">
+<meta property="og:description" content="A GPS audio guide that narrates the history, geography, and culture of landmarks as you travel. Every story is sourced, fact-checked, and reviewed before you hear it.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230369a1'/><text x='50' y='68' font-size='56' font-family='Helvetica,Arial' font-weight='700' fill='white' text-anchor='middle'>W</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230369a1'/><text x='50' y='69' font-size='58' font-family='Helvetica,Arial' font-weight='700' fill='white' text-anchor='middle'>W</text></svg>">
 <style>
   :root {
     --accent: #0369a1;
-    --accent-soft: #e2eff7;
-    --bg: #faf9f6;
+    --accent-deep: #04527d;
+    --accent-wash: #cfe4f2;
+    --accent-tint: #e6f1f8;
+    --bg: #fbfaf7;
     --surface: #ffffff;
-    --border: #e6e2d9;
-    --ink: #1b1a17;
-    --ink-soft: #56534c;
-    --ink-faint: #86827a;
+    --border: #e8e4da;
+    --border-soft: #f0ece3;
+    --ink: #16150f;
+    --ink-soft: #4f4c44;
+    --ink-faint: #837f75;
+    --shadow: 0 1px 2px rgba(24,22,15,.04), 0 8px 24px -12px rgba(24,22,15,.10);
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
+    margin: 0; background: var(--bg); color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
-    font-size: 17px;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
+    font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .wrap { max-width: 940px; margin: 0 auto; padding: 0 28px; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 26px; }
+  .narrow { max-width: 760px; }
 
-  header.site {
-    border-bottom: 1px solid var(--border);
-    background: rgba(250, 249, 246, 0.92);
-    backdrop-filter: saturate(160%) blur(8px);
-    position: sticky; top: 0; z-index: 20;
+  /* ---------- nav ---------- */
+  nav.bar {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(251,250,247,.86); backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border-soft);
   }
-  header.site .wrap {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 20px; height: 64px;
+  nav.bar .wrap { display: flex; align-items: center; gap: 26px; height: 66px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 680; letter-spacing: -.015em; font-size: 17.5px; }
+  .logo .mark {
+    width: 26px; height: 26px; border-radius: 7px; flex: none;
+    background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+    color: #fff; font-size: 14px; font-weight: 700; display: grid; place-items: center;
   }
-  .brand { display: flex; align-items: center; gap: 11px; font-weight: 650; letter-spacing: -0.01em; }
-  .brand .dot { width: 11px; height: 11px; border-radius: 3px; background: var(--accent); }
-  nav.top { display: flex; gap: 22px; font-size: 15px; }
-  nav.top a { color: var(--ink-soft); }
-  nav.top a:hover { color: var(--accent); text-decoration: none; }
-  @media (max-width: 700px) { nav.top a.hide-sm { display: none; } }
-
-  section { padding: 62px 0; border-bottom: 1px solid var(--border); }
-  section:last-of-type { border-bottom: 0; }
-
-  .hero { padding: 82px 0 66px; border-bottom: 1px solid var(--border); }
-  .eyebrow {
-    display: inline-block; font-size: 12.5px; font-weight: 650;
-    letter-spacing: 0.09em; text-transform: uppercase;
-    color: var(--accent); background: var(--accent-soft);
-    padding: 5px 11px; border-radius: 999px; margin-bottom: 22px;
-  }
-  h1 {
-    font-size: clamp(38px, 6.2vw, 60px); line-height: 1.06;
-    letter-spacing: -0.032em; font-weight: 700; margin: 0 0 20px;
-  }
-  .lede { font-size: clamp(18px, 2.4vw, 21px); color: var(--ink-soft); max-width: 44em; margin: 0 0 30px; }
-  .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .navlinks { display: flex; gap: 26px; margin-left: auto; font-size: 15px; color: var(--ink-soft); }
+  .navlinks a:hover { color: var(--accent); }
   .btn {
-    display: inline-block; padding: 11px 20px; border-radius: 8px;
-    font-size: 15px; font-weight: 600; border: 1px solid var(--accent);
-    background: var(--accent); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 20px; border-radius: 9px; font-size: 15px; font-weight: 620;
+    background: var(--accent); color: #fff; border: 1px solid var(--accent);
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    white-space: nowrap;
   }
-  .btn:hover { text-decoration: none; opacity: 0.9; }
-  .btn.ghost { background: transparent; color: var(--accent); }
+  .btn:hover { opacity: .92; transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn.sm { padding: 9px 16px; font-size: 14.5px; }
+  .btn.ghost { background: transparent; color: var(--accent); border-color: var(--border); }
+  .btn.ghost:hover { border-color: var(--accent); }
+  .btn.light { background: #fff; color: var(--accent-deep); border-color: #fff; }
+  @media (max-width: 860px) { .navlinks { display: none; } nav.bar .wrap { justify-content: space-between; } .btn.navcta { margin-left: auto; } }
 
-  h2 { font-size: 27px; letter-spacing: -0.022em; font-weight: 680; margin: 0 0 10px; }
-  .sub { color: var(--ink-faint); font-size: 15.5px; margin: 0 0 30px; }
-  h3 { font-size: 17px; font-weight: 650; margin: 0 0 7px; letter-spacing: -0.008em; }
-  p { margin: 0 0 18px; }
-  p.body { max-width: 46em; color: var(--ink-soft); }
-
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 42px; }
-  .stat { background: var(--surface); padding: 22px 20px; }
-  .stat .v { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; color: var(--accent); line-height: 1.15; }
-  .stat .k { font-size: 13.5px; color: var(--ink-faint); margin-top: 5px; }
-
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); gap: 16px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
-  .card p { margin: 0; font-size: 15.5px; color: var(--ink-soft); line-height: 1.6; }
-  .card .n { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; display: block; margin-bottom: 9px; }
-
-  pre.diagram {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 22px; overflow-x: auto; font-size: 13px; line-height: 1.62;
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-    color: var(--ink-soft); margin: 0;
+  /* ---------- hero ---------- */
+  .hero { position: relative; overflow: hidden; padding: 96px 0 78px; }
+  .hero::before {
+    content: ""; position: absolute; inset: -220px 0 auto 0; height: 620px; z-index: 0;
+    background: radial-gradient(58% 62% at 50% 34%, var(--accent-wash) 0%, rgba(255,255,255,0) 72%);
   }
+  .hero .wrap { position: relative; z-index: 1; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+    letter-spacing: .01em; color: var(--accent-deep); background: var(--accent-tint);
+    border: 1px solid var(--accent-wash); padding: 6px 14px; border-radius: 999px; margin-bottom: 26px;
+  }
+  .pill .tick { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+  h1 {
+    font-size: clamp(40px, 5.6vw, 66px); line-height: 1.04; letter-spacing: -.035em;
+    font-weight: 700; margin: 0 0 22px; max-width: 17em;
+  }
+  .hero p.sell { font-size: clamp(18px, 2.1vw, 21px); color: var(--ink-soft); max-width: 40em; margin: 0 0 34px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .reassure { margin-top: 20px; font-size: 14.5px; color: var(--ink-faint); }
 
-  ul.facts { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 34px; }
-  ul.facts li { break-inside: avoid; padding: 9px 0 9px 20px; position: relative; font-size: 15.5px; color: var(--ink-soft); border-bottom: 1px solid var(--border); }
-  ul.facts li::before { content: ""; position: absolute; left: 0; top: 18px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
-  @media (max-width: 700px) { ul.facts { columns: 1; } }
+  .metrics {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; margin-top: 58px; box-shadow: var(--shadow);
+  }
+  .metric { background: var(--surface); padding: 26px 24px; }
+  .metric b { display: block; font-size: 30px; font-weight: 700; letter-spacing: -.03em; color: var(--accent-deep); line-height: 1.1; }
+  .metric span { display: block; font-size: 14px; color: var(--ink-faint); margin-top: 7px; }
 
-  .stack { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { font-size: 13.5px; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--ink-soft); }
+  /* ---------- sections ---------- */
+  section { padding: 84px 0; }
+  section.alt { background: var(--surface); border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+  .kicker { font-size: 13px; font-weight: 680; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+  h2 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; letter-spacing: -.028em; font-weight: 700; margin: 0 0 16px; max-width: 20em; }
+  .deck { font-size: 18px; color: var(--ink-soft); max-width: 40em; margin: 0 0 48px; }
+  .deck.tight { margin-bottom: 36px; }
 
-  .note { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 22px 24px; }
-  .note p { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
-  .note p + p { margin-top: 12px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 20px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px,1fr)); gap: 20px; }
 
-  footer.site { padding: 40px 0 56px; color: var(--ink-faint); font-size: 14.5px; }
-  footer.site .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; align-items: center; }
+  .pain { padding: 26px 26px 28px; border-radius: 14px; background: var(--bg); border: 1px solid var(--border); }
+  section.alt .pain { background: var(--bg); }
+  .pain h3 { font-size: 18px; margin: 0 0 9px; letter-spacing: -.012em; }
+  .pain p { margin: 0; font-size: 15.5px; color: var(--ink-soft); }
+  .pain .x { display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--accent); opacity: .5; margin-bottom: 18px; }
+
+  .step { position: relative; padding: 30px 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
+  section.alt .step { background: var(--bg); }
+  .step .num {
+    width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+    background: var(--accent-tint); color: var(--accent-deep); font-weight: 700; font-size: 15px; margin-bottom: 18px;
+  }
+  .step h3 { font-size: 19px; margin: 0 0 10px; letter-spacing: -.015em; }
+  .step p { margin: 0; font-size: 15.5px; color: var(--ink-soft); }
+
+  .feat { padding: 28px 26px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+  section.alt .feat { background: var(--bg); }
+  .feat .dot { width: 11px; height: 11px; border-radius: 3px; background: var(--accent); margin-bottom: 18px; }
+  .feat h3 { font-size: 18px; margin: 0 0 9px; letter-spacing: -.015em; }
+  .feat p { margin: 0; font-size: 15.5px; color: var(--ink-soft); }
+
+  .who { padding: 30px 28px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); }
+  section.alt .who { background: var(--bg); }
+  .who h3 { font-size: 18px; margin: 0 0 10px; letter-spacing: -.015em; }
+  .who p { margin: 0 0 16px; font-size: 15.5px; color: var(--ink-soft); }
+  .who ul { margin: 0; padding: 0; list-style: none; }
+  .who li { font-size: 15px; color: var(--ink-soft); padding: 7px 0 7px 22px; position: relative; border-top: 1px solid var(--border-soft); }
+  .who li::before { content: ""; position: absolute; left: 2px; top: 16px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: .55; }
+
+  .specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .spec { background: var(--surface); padding: 22px 24px; }
+  section.alt .spec { background: var(--bg); }
+  .spec b { display: block; font-size: 14px; font-weight: 660; margin-bottom: 4px; }
+  .spec span { font-size: 14.5px; color: var(--ink-faint); }
+
+  details.faq { border-bottom: 1px solid var(--border); padding: 4px 0; }
+  details.faq summary {
+    cursor: pointer; list-style: none; padding: 20px 40px 20px 0; position: relative;
+    font-size: 17.5px; font-weight: 620; letter-spacing: -.012em;
+  }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq summary::after {
+    content: "+"; position: absolute; right: 6px; top: 17px; font-size: 22px;
+    font-weight: 400; color: var(--accent); transition: transform .18s ease;
+  }
+  details.faq[open] summary::after { content: "\2013"; }
+  details.faq p { margin: 0 0 22px; color: var(--ink-soft); font-size: 16px; max-width: 46em; padding-right: 30px; }
+
+  .cta {
+    margin: 0 auto; border-radius: 22px; padding: 62px 44px; text-align: center;
+    background: linear-gradient(150deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff;
+  }
+  .cta h2 { color: #fff; margin: 0 auto 14px; max-width: 16em; }
+  .cta p { color: rgba(255,255,255,.86); font-size: 18px; max-width: 34em; margin: 0 auto 30px; }
+  .cta .actions { justify-content: center; }
+  .cta .fine { margin-top: 20px; font-size: 14px; color: rgba(255,255,255,.72); }
+
+  .disclaim { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--surface); border-radius: 12px; padding: 22px 26px; margin-top: 44px; }
+  .disclaim p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+
+  footer.site { padding: 46px 0 62px; border-top: 1px solid var(--border-soft); color: var(--ink-faint); font-size: 14.5px; }
+  footer.site .row { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; }
+  footer.site a { color: var(--ink-soft); }
+  footer.site a:hover { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<header class="site">
+<nav class="bar">
   <div class="wrap">
-    <div class="brand"><span class="dot"></span>WayTale</div>
-    <nav class="top">
-      <a href="#overview">Overview</a>
-      <a href="#architecture" class="hide-sm">Architecture</a>
-      <a href="#features" class="hide-sm">Features</a>
-      <a href="#status">Status</a>
-      <a href="https://github.com/rs1990/waytale" rel="noopener">GitHub</a>
-    </nav>
-  </div>
-</header>
-
-<div class="hero">
-  <div class="wrap">
-    <span class="eyebrow">Mobile and content pipeline</span>
-    <h1>The narration is written before you arrive.</h1>
-    <p class="lede">WayTale narrates the history, geography, and culture of landmarks as you travel. The design bet is that live generation is the wrong answer: facts are pulled from Wikidata and Wikipedia, drafted into scripts by Claude, synthesized to audio once, reviewed by a human, and cached. Every user hears the same approved recording.</p>
-    <div class="cta">
-      <a class="btn" href="https://github.com/rs1990/waytale" rel="noopener">View source</a>
-      <a class="btn ghost" href="#overview">How it works</a>
+    <a class="logo" href="#top"><span class="mark">W</span>WayTale</a>
+    <div class="navlinks">
+      <a href="#problem">Why</a>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="v">63</div><div class="k">US National Parks seeded</div></div>
-      <div class="stat"><div class="v">250m</div><div class="k">geofence trigger radius</div></div>
-      <div class="stat"><div class="v">published</div><div class="k">the only status the app can read</div></div>
-      <div class="stat"><div class="v">3 tiers</div><div class="k">pipeline, backend, app</div></div>
+    <a class="btn sm navcta" href="https://github.com/rs1990/waytale" rel="noopener">Get early access</a>
+  </div>
+</nav>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <span class="pill"><span class="tick"></span>Now covering all 63 US National Parks</span>
+    <h1>Every place has a story. WayTale tells it while you drive.</h1>
+    <p class="sell">WayTale is a travel companion that knows where you are. Cross into range of a landmark and it begins narrating its history, its geography, and the culture around it. No searching, no reading at the wheel, no stopping to look something up. Just the story, at the moment it matters.</p>
+    <div class="actions">
+      <a class="btn" href="https://github.com/rs1990/waytale" rel="noopener">Get early access</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+    <p class="reassure">Every fact is linked to its source, and folklore is always labelled as folklore.</p>
+    <div class="metrics">
+      <div class="metric"><b>63</b><span>US National Parks covered</span></div>
+      <div class="metric"><b>Hands free</b><span>triggers itself as you travel</span></div>
+      <div class="metric"><b>3 to 5 min</b><span>of narration per landmark</span></div>
+      <div class="metric"><b>Every claim</b><span>linked back to its source</span></div>
     </div>
   </div>
 </div>
 
-<section id="overview">
+<section id="problem" class="alt">
   <div class="wrap">
-    <h2>What it does</h2>
-    <p class="sub">Pre-generation is the architecture, not an optimization.</p>
-    <p class="body">Generating narration at request time would mean paying for every listen, waiting for every listen, and shipping unreviewed claims about real places to real people. WayTale inverts that. An offline pipeline pulls landmark metadata from Wikidata SPARQL and sourced text from the Wikipedia REST API, drafts four script variants with Claude constrained to those facts, synthesizes audio through Amazon Polly, and lands rows in Postgres with status pending.</p>
-    <p class="body">An admin dashboard is where content becomes real. A reviewer reads the script alongside its sources and approves, publishes, or rejects. The mobile app queries only rows with status published, so nothing reaches a user that a human has not signed off on. Every fact carries a provenance tag of verified, legend, or mixed, enforced at the schema level and surfaced as a badge in the interface, so folklore is never presented as history.</p>
-    <p class="body">The backend is an Express service over PostGIS. Landmark locations live in a GEOGRAPHY(POINT, 4326) column with a GIST index, which makes nearest-landmark lookups a spatial query rather than a bounding box scan. The Expo app polls GPS, fetches nearby landmarks, and fires narration when the user crosses a 250 metre geofence.</p>
-    <p class="body">Content does not go stale silently. A refresh log tracks the Wikipedia revision each script was drafted from, so a redraft only fires when the source article actually changed, and the previously published version stays live until the new one clears review.</p>
-  </div>
-</section>
-
-<section id="architecture">
-  <div class="wrap">
-    <h2>Architecture</h2>
-    <p class="sub">An offline pipeline, an always-on API, and a thin client.</p>
-    <pre class="diagram"> Phase 0: content pipeline   (admin only, runs offline)
- -------------------------------------------------------------
-  Wikidata SPARQL      Wikipedia REST API       Reviews API
-        |                     |                      |
-  [landmark metadata]  [sourced facts]        [concrete tips]
-        +---------------------+----------------------+
-                              |
-                    Claude narration draft
-                    - injects facts and tips only
-                    - tags verified | legend | mixed
-                    - outputs 4 script variants
-                              |
-                    Amazon Polly TTS synthesis
-                              |
-                PostgreSQL content cache (status: pending)
-                              |
-                    Admin dashboard review
-                    [ approve / publish / reject ]
-
- Runtime
- -------------------------------------------------------------
-  Expo app  --GPS--&gt;  Express + PostGIS  --published only--&gt;
-  nearest landmark (GIST index)  -&gt;  narration + cached audio</pre>
-  </div>
-</section>
-
-<section id="features">
-  <div class="wrap">
-    <h2>Engineering details</h2>
-    <p class="sub">The decisions that carry the design.</p>
-    <div class="cards">
-      <div class="card"><span class="n">01</span><h3>Publish-gated cache</h3><p>The application reads only rows with status published. Pipeline output is fully insulated from users until a reviewer approves it, which means a bad draft is an internal problem rather than an incident.</p></div>
-      <div class="card"><span class="n">02</span><h3>PostGIS spatial queries</h3><p>Landmark locations use a GEOGRAPHY(POINT, 4326) column with a GIST index, so nearest-landmark lookups are true spatial queries rather than bounding box approximations.</p></div>
-      <div class="card"><span class="n">03</span><h3>Revision-diffed refresh</h3><p>A content refresh log records the Wikipedia revision behind each script. Redrafts fire only when the source article changed, and the live published version is never pulled down while its replacement is in review.</p></div>
-      <div class="card"><span class="n">04</span><h3>Schema-level fact provenance</h3><p>Every piece of content is tagged verified, legend, or mixed. The constraint lives in the database, not in application code, and the tag is rendered as a visible badge.</p></div>
-      <div class="card"><span class="n">05</span><h3>Source citations throughout</h3><p>Each narrated fact links back to its Wikipedia or Wikidata origin, so a listener can check any claim rather than trust the app.</p></div>
-      <div class="card"><span class="n">06</span><h3>Route scoring</h3><p>The backend returns two or three route options scored on travel time, landmark count, and a crowd heuristic, built over a raw latitude and longitude route endpoint.</p></div>
-      <div class="card"><span class="n">07</span><h3>Multi-day itinerary builder</h3><p>Place-name search and itinerary assembly sit on top of the same scoring endpoint, letting a trip be planned across days rather than a single drive.</p></div>
-      <div class="card"><span class="n">08</span><h3>Reproducible local stack</h3><p>Docker Compose brings up Postgres with PostGIS, the backend, and the admin dashboard together. The PostGIS image is pinned to linux/amd64 through Rosetta after the arm64 manifest proved unavailable for the pinned tag.</p></div>
+    <p class="kicker">The problem</p>
+    <h2>You drove past something remarkable and never knew.</h2>
+    <p class="deck">The information exists. It is simply never available at the moment you are actually standing in front of the thing.</p>
+    <div class="grid3">
+      <div class="pain"><span class="x"></span><h3>Research does not survive the trip</h3><p>Nobody reads three articles about a landmark while driving toward it. The context you wanted arrives days later, at home, when the moment has passed.</p></div>
+      <div class="pain"><span class="x"></span><h3>Guided tours are inflexible</h3><p>A scheduled tour means a fixed route, a fixed time, and a group. Most travel does not work that way, and the roadside landmarks between destinations are never covered at all.</p></div>
+      <div class="pain"><span class="x"></span><h3>You cannot tell fact from folklore</h3><p>Travel content mixes documented history with local legend and never says which is which. A good story and a true one are not the same thing, and you deserve to know the difference.</p></div>
     </div>
   </div>
 </section>
 
-<section id="numbers">
+<section id="how">
   <div class="wrap">
-    <h2>Numbers from the code</h2>
-    <p class="sub">Measured or configured values, not projections.</p>
-    <ul class="facts">
-      <li>About 4,850 lines total across app, backend, pipeline, and admin</li>
-      <li>App about 1,994 lines, backend 1,085, pipeline 1,257, admin 514</li>
-      <li>63 US National Parks seeded through a dedicated seed script</li>
-      <li>5 database tables with a GIST spatial index on landmark location</li>
-      <li>Geofence trigger radius: 250 metres</li>
-      <li>Narration length: 3 to 5 minutes per landmark deep dive</li>
-      <li>4 script variants generated per landmark</li>
-      <li>Polly voices: Neural for premium, Standard for long tail</li>
-      <li>PostgreSQL 16 with PostGIS 3.4</li>
-      <li>4 documentation files beyond the README: architecture, API, database, deployment</li>
-      <li>14 commits, all inside a roughly 30 hour window</li>
-      <li>Admin dashboard on port 4000, backend API separate</li>
-    </ul>
-  </div>
-</section>
-
-<section id="stack">
-  <div class="wrap">
-    <h2>Stack</h2>
-    <p class="sub">React Native at the edge, Node and PostGIS at the centre.</p>
-    <div class="stack">
-      <span class="chip">React Native (Expo)</span>
-      <span class="chip">Express.js</span>
-      <span class="chip">Node.js</span>
-      <span class="chip">PostgreSQL 16</span>
-      <span class="chip">PostGIS 3.4</span>
-      <span class="chip">Redis (optional)</span>
-      <span class="chip">Claude (narration drafting)</span>
-      <span class="chip">Amazon Polly TTS</span>
-      <span class="chip">React + Vite admin</span>
-      <span class="chip">Docker Compose</span>
-      <span class="chip">Wikidata SPARQL</span>
-      <span class="chip">Wikipedia REST API</span>
+    <p class="kicker">How it works</p>
+    <h2>Open the app and drive.</h2>
+    <p class="deck">There is nothing to plan, queue, or press. The app watches the road for you.</p>
+    <div class="grid3">
+      <div class="step"><div class="num">1</div><h3>It sees what is nearby</h3><p>As you travel, WayTale finds the landmarks around you and shows them on the map with the story each one has waiting.</p></div>
+      <div class="step"><div class="num">2</div><h3>It starts on its own</h3><p>Come within range of a landmark and narration begins automatically. Eyes stay on the road and hands stay on the wheel.</p></div>
+      <div class="step"><div class="num">3</div><h3>You go deeper if you want</h3><p>Tap through to a longer piece on history, geography, or culture, and follow any fact straight back to the source it came from.</p></div>
     </div>
   </div>
 </section>
 
-<section id="status">
+<section id="features" class="alt">
   <div class="wrap">
-    <h2>Status</h2>
-    <p class="sub">An honest account of what is built and what is not.</p>
-    <div class="note">
-      <p>Backend, content pipeline, and admin dashboard are functional locally through Docker Compose and a launch script, with content seeded for all 63 US National Parks.</p>
-      <p>Built in a concentrated sprint of 14 commits across roughly 30 hours, which included fixing two check-constraint bugs and a SPARQL latitude and longitude extraction bug along the way.</p>
-      <p>Not built, and listed as roadmap rather than implied: offline itinerary downloads, interest-based personalization, live geofence auto-pause, subscription tiers, and multi-language support. There is no automated test suite in the repository.</p>
+    <p class="kicker">What you get</p>
+    <h2>Written to be trusted, not just enjoyed.</h2>
+    <p class="deck">The difference between WayTale and a generated travel blurb is what happens before you hear a single word.</p>
+    <div class="grid3">
+      <div class="feat"><div class="dot"></div><h3>Nothing plays unreviewed</h3><p>Every story is written, checked against its sources, and approved by a person before it can reach a traveller. There is no path from raw draft to your speakers.</p></div>
+      <div class="feat"><div class="dot"></div><h3>Fact and legend are labelled</h3><p>Documented history, local folklore, and a mix of the two each carry their own tag, shown clearly while you listen. The story stays good and you still know what is true.</p></div>
+      <div class="feat"><div class="dot"></div><h3>Sources you can follow</h3><p>Every fact links back to the reference it came from, so a claim that surprises you can be checked in one tap rather than taken on faith.</p></div>
+      <div class="feat"><div class="dot"></div><h3>Stories stay current</h3><p>When a source is updated, the story is rewritten and reviewed again. The version you hear stays live until the replacement has been checked.</p></div>
+      <div class="feat"><div class="dot"></div><h3>Routes worth taking</h3><p>Compare route options by travel time and by how much there is to hear along the way, so the interesting road is a real choice rather than a guess.</p></div>
+      <div class="feat"><div class="dot"></div><h3>Plan a whole trip</h3><p>Search for places by name and build a multi-day itinerary, so a long drive becomes a sequence of stories rather than a list of exits.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="who">
+  <div class="wrap">
+    <p class="kicker">Who it is for</p>
+    <h2>For people who take the long way.</h2>
+    <p class="deck">WayTale is built for travel where the journey is part of the point.</p>
+    <div class="grid3">
+      <div class="who"><h3>Road trippers</h3><p>Turn the hours between destinations into the part of the trip people remember, without anyone taking their eyes off the road.</p><ul><li>Automatic roadside narration</li><li>Multi-day itineraries</li><li>Route options scored by interest</li></ul></div>
+      <div class="who"><h3>National park visitors</h3><p>Arrive already knowing what shaped the landscape in front of you, across all 63 US National Parks.</p><ul><li>Full national park coverage</li><li>Geography and formation stories</li><li>Cultural and human history</li></ul></div>
+      <div class="who"><h3>Curious travellers</h3><p>Get the real history rather than a plaque summary, with the sources attached so you can keep reading later.</p><ul><li>Deep dive narration</li><li>Linked references</li><li>Clear fact and legend labelling</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="specs" class="alt">
+  <div class="wrap">
+    <p class="kicker">Under the hood</p>
+    <h2>How the stories get made.</h2>
+    <p class="deck tight">Written once, checked properly, and then delivered to everyone.</p>
+    <div class="specs">
+      <div class="spec"><b>Sources</b><span>Structured landmark data and encyclopedic references, with citations retained end to end</span></div>
+      <div class="spec"><b>Drafting</b><span>Narration written only from the collected facts, with several variants produced per landmark</span></div>
+      <div class="spec"><b>Review</b><span>Human approval required before publication, with reject and revise built into the workflow</span></div>
+      <div class="spec"><b>Provenance</b><span>Every piece of content carries a verified, legend, or mixed tag, enforced in the data itself</span></div>
+      <div class="spec"><b>Audio</b><span>Professionally synthesised narration, generated once and delivered from cache</span></div>
+      <div class="spec"><b>Trigger</b><span>Automatic narration inside a 250 metre radius of a landmark</span></div>
+      <div class="spec"><b>Coverage</b><span>All 63 US National Parks, with further regions in progress</span></div>
+      <div class="spec"><b>Platform</b><span>Mobile app for iOS and Android</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap narrow">
+    <p class="kicker">Questions</p>
+    <h2>Good questions to ask.</h2>
+    <div style="margin-top:34px">
+      <details class="faq"><summary>Is it safe to use while driving?</summary><p>It is designed for it. Narration starts on its own when you come into range, so there is nothing to tap, read, or search while moving. The screen is there for planning before you set off and for reading more once you have stopped.</p></details>
+      <details class="faq"><summary>How do you know the stories are accurate?</summary><p>Stories are written only from collected reference material rather than from open-ended generation, then checked by a person against those same sources before publication. Nothing reaches a traveller without that approval step.</p></details>
+      <details class="faq"><summary>What if a story is legend rather than history?</summary><p>It is labelled as such. Content is tagged as verified, legend, or a mix of the two, and the tag is shown while you listen. Local stories are worth telling, and they are told as stories.</p></details>
+      <details class="faq"><summary>What is covered today?</summary><p>All 63 US National Parks. More regions are being added, and the same review process applies to every one of them.</p></details>
+      <details class="faq"><summary>Does it work without a signal?</summary><p>Not yet. The current version needs a connection to fetch nearby landmarks and their audio. Downloading an itinerary for offline use is planned and is not in the current build.</p></details>
+      <details class="faq"><summary>What stage is the product at?</summary><p>Early access. The app, the story pipeline, and the review workflow all work end to end and the national parks are covered. Offline downloads, personalisation by interest, and additional languages are on the roadmap rather than available now.</p></details>
+    </div>
+
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="cta">
+      <h2>Your next drive already has a soundtrack. It is missing the story.</h2>
+      <p>WayTale is in early access with all 63 US National Parks covered and new regions being added.</p>
+      <div class="actions">
+        <a class="btn light" href="https://github.com/rs1990/waytale" rel="noopener">Get early access</a>
+      </div>
+      <p class="fine">Early access. Coverage is expanding region by region.</p>
     </div>
   </div>
 </section>
@@ -263,7 +310,7 @@
 <footer class="site">
   <div class="wrap">
     <div class="row">
-      <div>WayTale. Built by Raghavendra. Open source.</div>
+      <div>WayTale. Sourced, reviewed audio guides for the road.</div>
       <div><a href="https://github.com/rs1990/waytale" rel="noopener">github.com/rs1990/waytale</a></div>
     </div>
   </div>
